@@ -25,7 +25,6 @@
 
     <a-assets timeout="60000">
       <img id="anchorImage" src="./qr/anchor-target.png" />
-      <a-asset-item id="gltfModel" src="./assets/models/model.glb?v=10"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -41,23 +40,22 @@
         material="transparent: true; opacity: 0.08; side: double">
       </a-plane>
 
-      <!-- 빨간 박스: 앵커가 정상 인식되는지 확인용 -->
+      <!-- 앵커 확인용 빨간 박스 -->
       <a-box
         position="-0.5 0 0.1"
         scale="0.08 0.08 0.08"
         color="red">
       </a-box>
 
-      <!-- GLB 모델 -->
-      <a-gltf-model
+      <!-- GLB 테스트 모델: 먼저 test_box.glb로 확인 -->
+      <a-entity
         id="arModel"
-        src="#gltfModel"
-        position="0 0 0.12"
+        gltf-model="url(./assets/models/test_box.glb?v=1)"
+        position="0 0 0.2"
         rotation="0 0 0"
-        scale="0.3 0.3 0.3"
-        visible="true"
-        gesture-control="minScale: 0.001; maxScale: 6">
-      </a-gltf-model>
+        scale="1 1 1"
+        visible="true">
+      </a-entity>
 
       <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
       <a-light type="directional" color="#ffffff" intensity="1.0" position="0 1 1"></a-light>
@@ -89,12 +87,12 @@
       });
 
       model.addEventListener('model-loaded', function () {
-        status.textContent = 'GLB 모델 로드 완료: 앵커 QR 위를 확인하세요.';
+        status.textContent = 'GLB 모델 로드 완료: QR 위에 모델이 보여야 합니다.';
         console.log('GLB loaded successfully');
       });
 
       model.addEventListener('model-error', function (event) {
-        status.textContent = 'GLB 모델 로드 실패: model.glb 파일 또는 변환 상태를 확인하세요.';
+        status.textContent = 'GLB 모델 로드 실패: 파일명, 경로, GLB 변환 상태를 확인하세요.';
         console.error('GLB load error:', event);
       });
     });
