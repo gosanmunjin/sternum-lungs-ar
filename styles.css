@@ -1,0 +1,120 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0b1020;
+  color: #f8fafc;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+body.home {
+  padding: 24px;
+  background: radial-gradient(circle at top, #1e3a8a 0, #0b1020 45%, #020617 100%);
+}
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+}
+.card {
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.35);
+}
+h1 { margin: 0 0 12px; font-size: clamp(28px, 6vw, 48px); line-height: 1.05; }
+p, li { color: #cbd5e1; line-height: 1.65; }
+a.button, button.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 0;
+  background: #38bdf8;
+  color: #082f49;
+  font-weight: 800;
+  text-decoration: none;
+  margin: 8px 8px 8px 0;
+}
+.secondary { background: #e2e8f0 !important; color: #0f172a !important; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.qrbox {
+  background: #fff;
+  color: #111827;
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+}
+.qrbox img { max-width: 100%; height: auto; image-rendering: pixelated; }
+.small { font-size: 0.92rem; color: #94a3b8; }
+code { background: rgba(148,163,184,0.18); padding: 2px 6px; border-radius: 6px; }
+#status {
+  position: fixed;
+  z-index: 1000;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.75);
+  color: white;
+  font-weight: 700;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+#help {
+  position: fixed;
+  z-index: 1000;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(2, 6, 23, 0.68);
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.print-body {
+  background: white;
+  color: #111827;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 18px;
+}
+.print-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.print-card {
+  border: 2px solid #111827;
+  border-radius: 16px;
+  padding: 18px;
+  page-break-inside: avoid;
+  text-align: center;
+}
+.print-card img { max-width: 85%; image-rendering: pixelated; }
+.print-card h2 { margin: 0 0 8px; }
+.print-card p { color: #111827; }
+@media print {
+  .no-print { display: none !important; }
+  .print-body { padding: 0; }
+}
+@media (max-width: 700px) {
+  .print-grid { grid-template-columns: 1fr; }
+}

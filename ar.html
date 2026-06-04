@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>QR Marker AR Viewer</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./libs/aframe-v1.5.0.min.js"></script>
+  <script src="./libs/mindar-image-aframe.prod.js"></script>
+  <script src="./gesture.js"></script>
+</head>
+<body>
+  <div id="status">카메라 권한을 허용한 뒤 앵커 QR을 비추세요.</div>
+  <div id="help">한 손가락: 회전 · 두 손가락: 확대/축소 · QR을 평평하게 두고 밝은 곳에서 사용</div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets/anchor.mind; maxTrack: 1; uiScanning: yes; filterMinCF: 0.0001; filterBeta: 0.001;"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+
+    <a-assets timeout="30000">
+      <img id="anchorImage" src="./qr/anchor-target.png" />
+      <a-asset-item id="objModel" src="./assets/models/model.obj"></a-asset-item>
+      <a-asset-item id="mtlModel" src="./assets/models/model.mtl"></a-asset-item>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="anchorTarget" mindar-image-target="targetIndex: 0">
+      <!-- faint transparent copy of the QR plane, useful for alignment; set opacity to 0 if not wanted -->
+      <a-plane src="#anchorImage" position="0 0 0" width="1" height="1" rotation="0 0 0"
+               material="transparent: true; opacity: 0.08; side: double"></a-plane>
+
+      <!-- Replace model.obj / model.mtl with your own OBJ. Adjust scale/rotation if needed. -->
+      <a-obj-model id="arModel"
+        src="#objModel"
+        mtl="#mtlModel"
+        position="0 0 0.16"
+        rotation="0 0 0"
+        scale="0.9 0.9 0.9"
+        gesture-control="minScale: 0.05; maxScale: 6">
+      </a-obj-model>
+
+      <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
+      <a-light type="directional" color="#ffffff" intensity="0.8" position="0 1 1"></a-light>
+    </a-entity>
+  </a-scene>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const status = document.querySelector('#status');
+      const target = document.querySelector('#anchorTarget');
+      const scene = document.querySelector('a-scene');
+
+      scene.addEventListener('arReady', function () {
+        status.textContent = '준비 완료: 앵커 QR을 카메라 중앙에 비추세요.';
+      });
+      scene.addEventListener('arError', function () {
+        status.textContent = '카메라를 시작하지 못했습니다. 브라우저 권한과 HTTPS 주소를 확인하세요.';
+      });
+      target.addEventListener('targetFound', function () {
+        status.textContent = '앵커 QR 인식됨: 3D 모델 표시 중';
+      });
+      target.addEventListener('targetLost', function () {
+        status.textContent = '앵커 QR을 다시 화면 중앙에 비추세요.';
+      });
+    });
+  </script>
+</body>
+</html>

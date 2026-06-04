@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>흉골·폐 QR 마커 AR</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="home">
+  <main class="wrap">
+    <section class="card">
+      <h1>QR 마커 위에 3D 모델 띄우기</h1>
+      <p>
+        이 버전은 모바일 카메라로 웹페이지에 접속한 뒤, 별도의 <strong>앵커 QR</strong>을 화면에 비추면
+        그 QR 코드 위에 OBJ 3D 모델이 고정되어 뜨는 방식입니다.
+      </p>
+      <p>
+        <a class="button" href="./ar.html">AR 실행</a>
+        <a class="button secondary" href="./qr/print-for-students.html">학생 배부용 QR 보기/출력</a>
+      </p>
+      <div class="grid">
+        <div class="qrbox">
+          <h2>1. 접속 QR</h2>
+          <img src="./qr/access-url.png" alt="AR 페이지 접속 QR" />
+          <p>학생이 모바일 기본 카메라로 먼저 찍는 QR입니다.</p>
+        </div>
+        <div class="qrbox">
+          <h2>2. 앵커 QR</h2>
+          <img src="./qr/anchor-target.png" alt="3D 모델 위치 기준이 되는 앵커 QR" />
+          <p>AR 페이지가 열린 뒤 카메라로 비추는 위치 기준 QR입니다.</p>
+        </div>
+      </div>
+      <p class="small">
+        조작: 한 손가락 드래그 = 모델 회전, 두 손가락 핀치 = 확대/축소.
+        실제 OBJ는 <code>assets/models/model.obj</code>, <code>assets/models/model.mtl</code>에 교체하면 됩니다.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
