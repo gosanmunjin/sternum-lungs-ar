@@ -4,11 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>QR Marker AR Viewer</title>
+
   <link rel="stylesheet" href="./styles.css" />
+
   <script src="./libs/aframe-v1.5.0.min.js"></script>
   <script src="./libs/mindar-image-aframe.prod.js"></script>
   <script src="./gesture.js"></script>
 </head>
+
 <body>
   <div id="status">카메라 권한을 허용한 뒤 앵커 QR을 비추세요.</div>
   <div id="help">한 손가락: 회전 · 두 손가락: 확대/축소 · QR을 평평하게 두고 밝은 곳에서 사용</div>
@@ -20,34 +23,45 @@
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
-    <a-assets timeout="30000">
+    <a-assets timeout="60000">
       <img id="anchorImage" src="./qr/anchor-target.png" />
-      <a-asset-item id="gltfModel" src="./assets/models/model.glb"></a-asset-item>
+      <a-asset-item id="gltfModel" src="./assets/models/model.glb?v=10"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
     <a-entity id="anchorTarget" mindar-image-target="targetIndex: 0">
-      <!-- faint transparent copy of the QR plane, useful for alignment; set opacity to 0 if not wanted -->
-      <a-plane src="#anchorImage" position="0 0 0" width="1" height="1" rotation="0 0 0"
-               material="transparent: true; opacity: 0.08; side: double"></a-plane>
 
-      <!-- Replace model.obj / model.mtl with your own OBJ. Adjust scale/rotation if needed. -->
+      <a-plane
+        src="#anchorImage"
+        position="0 0 0"
+        width="1"
+        height="1"
+        rotation="0 0 0"
+        material="transparent: true; opacity: 0.08; side: double">
+      </a-plane>
+
+      <!-- 빨간 박스: 앵커가 정상 인식되는지 확인용 -->
       <a-box
-        position="0 0 0.1"
-        scale="0.3 0.3 0.3"
+        position="-0.5 0 0.1"
+        scale="0.08 0.08 0.08"
         color="red">
       </a-box>
 
-     <a-gltf-model id="arModel"
+      <!-- GLB 모델 -->
+      <a-gltf-model
+        id="arModel"
         src="#gltfModel"
-        position="0 0 0.02"
+        position="0 0 0.12"
         rotation="0 0 0"
-        scale="1 1 1">
+        scale="0.3 0.3 0.3"
+        visible="true"
+        gesture-control="minScale: 0.001; maxScale: 6">
       </a-gltf-model>
-    
-      <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
-      <a-light type="directional" color="#ffffff" intensity="0.8" position="0 1 1"></a-light>
+
+      <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
+      <a-light type="directional" color="#ffffff" intensity="1.0" position="0 1 1"></a-light>
+
     </a-entity>
   </a-scene>
 
@@ -56,18 +70,32 @@
       const status = document.querySelector('#status');
       const target = document.querySelector('#anchorTarget');
       const scene = document.querySelector('a-scene');
+      const model = document.querySelector('#arModel');
 
       scene.addEventListener('arReady', function () {
         status.textContent = '준비 완료: 앵커 QR을 카메라 중앙에 비추세요.';
       });
+
       scene.addEventListener('arError', function () {
         status.textContent = '카메라를 시작하지 못했습니다. 브라우저 권한과 HTTPS 주소를 확인하세요.';
       });
+
       target.addEventListener('targetFound', function () {
-        status.textContent = '앵커 QR 인식됨: 3D 모델 표시 중';
+        status.textContent = '앵커 QR 인식됨: GLB 모델 표시 시도 중';
       });
+
       target.addEventListener('targetLost', function () {
         status.textContent = '앵커 QR을 다시 화면 중앙에 비추세요.';
+      });
+
+      model.addEventListener('model-loaded', function () {
+        status.textContent = 'GLB 모델 로드 완료: 앵커 QR 위를 확인하세요.';
+        console.log('GLB loaded successfully');
+      });
+
+      model.addEventListener('model-error', function (event) {
+        status.textContent = 'GLB 모델 로드 실패: model.glb 파일 또는 변환 상태를 확인하세요.';
+        console.error('GLB load error:', event);
       });
     });
   </script>
