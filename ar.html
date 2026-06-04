@@ -50,11 +50,12 @@
       <!-- GLB 테스트 모델: 먼저 test_box.glb로 확인 -->
       <a-entity
         id="arModel"
-        gltf-model="url(./assets/models/test_box.glb?v=1)"
-        position="0 0 0.2"
+        gltf-model="url(./assets/models/model.glb?v=20)"
+        position="0 0 0.02"
         rotation="0 0 0"
         scale="1 1 1"
-        visible="true">
+        visible="true"
+        gesture-control="minScale: 0.001; maxScale: 6">
       </a-entity>
 
       <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
