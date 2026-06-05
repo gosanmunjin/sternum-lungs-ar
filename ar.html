@@ -9,7 +9,6 @@
 
   <script src="./libs/aframe-v1.5.0.min.js"></script>
   <script src="./libs/mindar-image-aframe.prod.js"></script>
-
 </head>
 
 <body>
@@ -19,7 +18,7 @@
   <a-scene
     mindar-image="imageTargetSrc: ./targets/anchor.mind; maxTrack: 1; uiScanning: yes; filterMinCF: 0.0001; filterBeta: 0.001;"
     color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true;"
+    renderer="colorManagement: true; physicallyCorrectLights: false; antialias: true;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
@@ -40,24 +39,24 @@
         material="transparent: true; opacity: 0.08; side: double">
       </a-plane>
 
-      <!-- 앵커 확인용 빨간 박스 -->
+      <!-- 앵커 확인용 빨간 박스: 최종 확인 후 삭제 가능 -->
       <a-box
         position="-0.5 0 0.1"
         scale="0.08 0.08 0.08"
         color="red">
       </a-box>
 
-      <!-- GLB 테스트 모델: 먼저 test_box.glb로 확인 -->
-    <a-entity
+      <!-- 해부학 모델 -->
+      <a-entity
         id="arModel"
-        gltf-model="url(./assets/models/anatomy_parts_colored_v1.glb?v=21)"
+        gltf-model="url(./assets/models/anatomy_parts_colored_v1.glb?v=30)"
         position="0 0 0"
         rotation="0 0 0"
         scale="1 1 1"
         visible="true">
       </a-entity>
 
-      <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
+      <a-light type="ambient" color="#ffffff" intensity="2.0"></a-light>
       <a-light type="directional" color="#ffffff" intensity="1.0" position="0 1 1"></a-light>
 
     </a-entity>
@@ -69,80 +68,23 @@
       const target = document.querySelector('#anchorTarget');
       const scene = document.querySelector('a-scene');
       const model = document.querySelector('#arModel');
-  
-      scene.addEventListener('arReady', function () {
-        status.textContent = '준비 완료: 앵커 QR을 카메라 중앙에 비추세요.';
-      });
-  
-      scene.addEventListener('arError', function () {
-        status.textContent = '카메라를 시작하지 못했습니다. 브라우저 권한과 HTTPS 주소를 확인하세요.';
-      });
-  
-      target.addEventListener('targetFound', function () {
-        status.textContent = '앵커 QR 인식됨: GLB 모델 표시 중';
-      });
-  
-      target.addEventListener('targetLost', function () {
-        status.textContent = '앵커 QR을 다시 화면 중앙에 비추세요.';
-      });
-  
-      model.addEventListener('model-loaded', function () {
 
-
-       status.textContent = 'GLB 모델 로드 완료: 색상 강제 적용 중';
-
-          const mesh = model.getObject3D('mesh');
-        
-          const colors = [
-            '#f2e6c9', // 흉골
-            '#b8784a', // 기관지
-            '#ff8fa3', // 폐엽 1
-            '#ffa6b8', // 폐엽 2
-            '#ec6a87', // 폐엽 3
-            '#ffc0cb', // 폐엽 4
-            '#dc5a78'  // 폐엽 5
-          ];
-        
-          let i = 0;
-        
-          mesh.traverse(function (node) {
-            if (!node.isMesh) return;
-        
-            node.material = new THREE.MeshBasicMaterial({
-              color: colors[i % colors.length],
-              side: THREE.DoubleSide
-            });
-        
-            node.material.needsUpdate = true;
-            i++;
-          });
-
-            
-        status.textContent = 'GLB 모델 로드 완료: 한 손가락 회전, 두 손가락 확대/축소 가능';
-        console.log('GLB loaded successfully');
-      });
-  
-      model.addEventListener('model-error', function (event) {
-        status.textContent = 'GLB 모델 로드 실패: 파일명, 경로, GLB 변환 상태를 확인하세요.';
-        console.error('GLB load error:', event);
-      });
-  
       let isDragging = false;
       let isPinching = false;
       let lastX = 0;
       let lastY = 0;
       let lastDistance = 0;
       let currentScale = 1.0;
-  
+
       const minScale = 0.1;
       const maxScale = 6.0;
-  
+
       function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
       }
-  
+
       function applyScale() {
         model.setAttribute('scale', {
           x: currentScale,
@@ -150,7 +92,72 @@
           z: currentScale
         });
       }
-  
+
+      function forceApplyColors() {
+        const mesh = model.getObject3D('mesh');
+
+        if (!mesh) {
+          status.textContent = '모델 mesh를 아직 찾지 못했습니다.';
+          return;
+        }
+
+        const colors = [
+          '#f2e6c9', // 흉골: 뼈색
+          '#b8784a', // 기관지: 갈색
+          '#ff8fa3', // 폐엽 1
+          '#ffa6b8', // 폐엽 2
+          '#ec6a87', // 폐엽 3
+          '#ffc0cb', // 폐엽 4
+          '#dc5a78'  // 폐엽 5
+        ];
+
+        let partIndex = 0;
+
+        mesh.traverse(function (node) {
+          if (!node.isMesh) return;
+
+          const color = colors[partIndex % colors.length];
+
+          node.material = new THREE.MeshBasicMaterial({
+            color: color,
+            side: THREE.DoubleSide
+          });
+
+          node.material.needsUpdate = true;
+
+          console.log('Colored mesh:', partIndex, node.name, color);
+          partIndex++;
+        });
+
+        status.textContent = '색상 적용 완료: 한 손가락 회전, 두 손가락 확대/축소 가능';
+      }
+
+      scene.addEventListener('arReady', function () {
+        status.textContent = '준비 완료: 앵커 QR을 카메라 중앙에 비추세요.';
+      });
+
+      scene.addEventListener('arError', function () {
+        status.textContent = '카메라를 시작하지 못했습니다. 브라우저 권한과 HTTPS 주소를 확인하세요.';
+      });
+
+      target.addEventListener('targetFound', function () {
+        status.textContent = '앵커 QR 인식됨: 모델 표시 중';
+      });
+
+      target.addEventListener('targetLost', function () {
+        status.textContent = '앵커 QR을 다시 화면 중앙에 비추세요.';
+      });
+
+      model.addEventListener('model-loaded', function () {
+        status.textContent = 'GLB 모델 로드 완료: 색상 적용 중';
+        forceApplyColors();
+      });
+
+      model.addEventListener('model-error', function (event) {
+        status.textContent = 'GLB 모델 로드 실패: 파일명과 경로를 확인하세요.';
+        console.error('GLB load error:', event);
+      });
+
       window.addEventListener('touchstart', function (event) {
         if (event.touches.length === 1) {
           isDragging = true;
@@ -158,59 +165,55 @@
           lastX = event.touches[0].clientX;
           lastY = event.touches[0].clientY;
         }
-  
+
         if (event.touches.length === 2) {
           isDragging = false;
           isPinching = true;
           lastDistance = getDistance(event.touches);
         }
       }, { passive: false });
-  
+
       window.addEventListener('touchmove', function (event) {
         event.preventDefault();
-  
+
         if (event.touches.length === 1 && isDragging) {
           const touch = event.touches[0];
           const dx = touch.clientX - lastX;
           const dy = touch.clientY - lastY;
-  
+
           const rotation = model.getAttribute('rotation');
-  
+
           model.setAttribute('rotation', {
             x: rotation.x + dy * 0.3,
             y: rotation.y + dx * 0.3,
             z: rotation.z
           });
-  
+
           lastX = touch.clientX;
           lastY = touch.clientY;
-  
-          status.textContent = '회전 중';
         }
-  
+
         if (event.touches.length === 2 && isPinching) {
           const distance = getDistance(event.touches);
-  
+
           if (lastDistance > 0) {
             const ratio = distance / lastDistance;
             currentScale = currentScale * ratio;
             currentScale = Math.max(minScale, Math.min(maxScale, currentScale));
             applyScale();
-  
-            status.textContent = '확대/축소 중: scale ' + currentScale.toFixed(2);
           }
-  
+
           lastDistance = distance;
         }
       }, { passive: false });
-  
+
       window.addEventListener('touchend', function (event) {
         if (event.touches.length === 0) {
           isDragging = false;
           isPinching = false;
           lastDistance = 0;
         }
-  
+
         if (event.touches.length === 1) {
           isDragging = true;
           isPinching = false;
