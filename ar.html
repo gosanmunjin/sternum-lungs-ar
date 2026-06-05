@@ -87,6 +87,35 @@
       });
   
       model.addEventListener('model-loaded', function () {
+
+
+        const mesh = model.getObject3D('mesh');
+        
+          mesh.traverse(function(node) {
+        
+            if (!node.isMesh) return;
+        
+            console.log(node.name);
+        
+            node.material = node.material.clone();
+        
+            // 임시 테스트
+            node.material.color.set('#ff8080');
+        
+            node.material.needsUpdate = true;
+        
+
+
+
+
+
+
+
+
+
+
+
+        
         status.textContent = 'GLB 모델 로드 완료: 한 손가락 회전, 두 손가락 확대/축소 가능';
         console.log('GLB loaded successfully');
       });
