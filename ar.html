@@ -89,22 +89,35 @@
       model.addEventListener('model-loaded', function () {
 
 
-        const mesh = model.getObject3D('mesh');
+       status.textContent = 'GLB 모델 로드 완료: 색상 강제 적용 중';
+
+          const mesh = model.getObject3D('mesh');
         
-          mesh.traverse(function(node) {
+          const colors = [
+            '#f2e6c9', // 흉골
+            '#b8784a', // 기관지
+            '#ff8fa3', // 폐엽 1
+            '#ffa6b8', // 폐엽 2
+            '#ec6a87', // 폐엽 3
+            '#ffc0cb', // 폐엽 4
+            '#dc5a78'  // 폐엽 5
+          ];
         
+          let i = 0;
+        
+          mesh.traverse(function (node) {
             if (!node.isMesh) return;
         
-            console.log(node.name);
-        
-            node.material = node.material.clone();
-        
-            // 임시 테스트
-            node.material.color.set('#ff8080');
+            node.material = new THREE.MeshBasicMaterial({
+              color: colors[i % colors.length],
+              side: THREE.DoubleSide
+            });
         
             node.material.needsUpdate = true;
-        
-        
+            i++;
+          });
+
+            
         status.textContent = 'GLB 모델 로드 완료: 한 손가락 회전, 두 손가락 확대/축소 가능';
         console.log('GLB loaded successfully');
       });
